@@ -6,16 +6,16 @@
         {
             while (true)
             {
-                Console.WriteLine("Please type '0' to convert decimal to binary, or type '1' to convert binary to decimal");
+                Console.WriteLine("Please type '1' to convert decimal to binary, or type '2' to convert binary to decimal");
 
                 switch (Console.ReadLine())
                 {
-                    case "0":
-                        Console.WriteLine("Enter decimal integer number:");
+                    case "1":
+                        Console.WriteLine("Enter decimal number:");
                         DecimalToBinary();
                         break;
 
-                    case "1":
+                    case "2":
                         Console.WriteLine("Enter binary number:");
                         BinaryToDecimal();
                         break;
@@ -30,31 +30,60 @@
             }
         }
 
-        private static void DecimalToBinary()
+        private static void DecimalToBinary(int round = 10)
         {
-            int _decimal;
-            try
+            int intPart;
+            int fractPart;
+            string binary = string.Empty;
+
+            string _decimal = Console.ReadLine();
+
+            if (!decimal.TryParse(_decimal, out _))
             {
-                _decimal = int.Parse(Console.ReadLine());
-            }
-            catch (FormatException)
-            {
-                Console.WriteLine("Value entered is not a decimal integer number. Please try again.");
+                Console.WriteLine("Value entered is not a decimal number. Please try again.");
                 return;
             }
-            string binary = string.Empty;
-            if (_decimal < 2)
-                binary = _decimal.ToString();
-            else
+
+            string[] parts = _decimal.Split(new char[] { '.', ',' });
+
+            //convert integer part of decimal
+            intPart = Convert.ToInt32(parts[0]); 
+            int remainder;
+            while (intPart > 0)
             {
-                int remainder;
-                while (_decimal > 0)
-                {
-                    remainder = _decimal % 2;
-                    _decimal /= 2;
-                    binary = remainder.ToString() + binary;
-                }
+                remainder = intPart % 2;
+                intPart /= 2;
+                binary = remainder.ToString() + binary;
             }
+
+            if (parts.Count() > 1)
+            {
+                //convert fractional part of decimal
+                fractPart = Convert.ToInt32(parts[1]);
+                if (fractPart != 0)
+                {
+                    binary += '.';
+                    int count = parts[1].Length;
+
+                    for (int i = 0; i < round; i++)
+                    {
+                        fractPart = fractPart * 2;
+                        if (fractPart.ToString().Length > count)
+                        {
+                            string buf = fractPart.ToString();
+                            buf = buf.Remove(0, 1);
+                            fractPart = Convert.ToInt32(buf);
+
+                            binary += '1';
+                        }
+                        else
+                        {
+                            binary += '0';
+                        }
+                    }
+               }
+            }
+
             Console.WriteLine($"Binary is: {binary}\n");
         }
 
@@ -65,25 +94,33 @@
             string binary = Console.ReadLine();
             for (i = 0; i < binary.Length; i++)
             {
-                if ((binary[i] != '1') && (binary[i] != '0'))
+                if ((binary[i] != '1') && (binary[i] != '0') && (binary[i] != '.') && (binary[i] != ','))
                 {
-                    Console.WriteLine("The number entered is incorrect. Please try again.");
+                    Console.WriteLine("Value entered is not a binary number. Please try again.");
                     return;
                 }
             }
 
-            if (int.Parse(binary) < 2)
-                _decimal = int.Parse(binary);
-            else
+            string[] parts = binary.Split(new char[] { '.', ',' });
+
+            binary = parts[0]; //convert integer part of binary
+            for (i = 0; i < binary.Length; i++)
             {
-                for (i = 0; i < binary.Length; i++)
+                if (binary[binary.Length - i - 1] == '0') continue;
+                _decimal += (double)Math.Pow(2, i);
+            }
+
+            if (parts.Length > 1)
+            {
+                binary = parts[1]; //convert fractional part of binary
+                for (i = 1; i <= binary.Length; i++)
                 {
-                    if (binary[binary.Length - i - 1] == '0') continue;
-                    _decimal += (int)Math.Pow(2, i);
+                    if (binary[i - 1] == '0') continue;
+                    _decimal += (double)Math.Pow(2, -i);
                 }
             }
 
-            Console.WriteLine("Decimal number = " + _decimal);
+            Console.WriteLine($"Decimal is {_decimal}");
         }
     }
 }
