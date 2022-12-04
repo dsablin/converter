@@ -126,3 +126,8 @@ Desktop.ini
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
+/.vs/Converter/DesignTimeBuild/.dtbcache.v2
+*.vsidx
+*.lock
+*.v2
+*.2
